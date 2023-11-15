@@ -7,7 +7,8 @@ const connectDB = require('./config/db');
 const https = require('https');
 const asyncHandler = require('./async');
 const errorHandler = require('./error');
-const Transaction = require('./transaction.model')
+const Transaction = require('./transaction.model');
+const ErrorResponse = require('./errorResponse');
 
 // Load env vars
 dotenv.config({path: './config/.env'});
@@ -34,7 +35,7 @@ app.use(cors());
 
 
 
-app.post('/split-payments/compute', async (req, res) => {
+app.post('/split-payments/compute', asyncHandler    ( async (req, res, next) => {
     const {ID, Amount, Currency, CustomerEmail, SplitInfo} = req.body
     let balance = Amount
     let SplitBreakdown = []
@@ -54,11 +55,15 @@ app.post('/split-payments/compute', async (req, res) => {
 
     if(flat.length > 0){
         for(let i = 0; i < flat.length; i++){
-            balance -= flat[i].SplitValue
-            SplitBreakdown.push({
-                SplitEntityId: SplitInfo[i].SplitEntityId,
-                Amount: flat[i].SplitValue
-            })
+            if( balance > flat[i].SplitValue){
+                balance -= flat[i].SplitValue
+                SplitBreakdown.push({
+                    SplitEntityId: SplitInfo[i].SplitEntityId,
+                    Amount: flat[i].SplitValue
+                })
+            }else{
+                return next(new ErrorResponse("You have insufficient balance"))
+            }
         }
     }
     
@@ -99,7 +104,7 @@ app.post('/split-payments/compute', async (req, res) => {
         SplitBreakdown: SplitBreakdown
     });
  
-});
+}));
 
 app.use(errorHandler);
 
