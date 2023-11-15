@@ -12,7 +12,7 @@ const Transaction = require('./transaction.model')
 // Load env vars
 dotenv.config({path: './config/.env'});
 
-connectDB();
+// connectDB();
 
 
 const app = express();
