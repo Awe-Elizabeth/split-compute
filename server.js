@@ -38,6 +38,7 @@ app.use(cors());
 app.post('/split-payments/compute', asyncHandler    ( async (req, res, next) => {
     const {ID, Amount, Currency, CustomerEmail, SplitInfo} = req.body
     let balance = Amount
+
     let SplitBreakdown = []
     // const list = ["FLAT", "PERCENTAGE", "RATIO"]
     
@@ -58,7 +59,7 @@ app.post('/split-payments/compute', asyncHandler    ( async (req, res, next) => 
             if( balance > flat[i].SplitValue){
                 balance -= flat[i].SplitValue
                 SplitBreakdown.push({
-                    SplitEntityId: SplitInfo[i].SplitEntityId,
+                    SplitEntityId: flat[i].SplitEntityId,
                     Amount: flat[i].SplitValue
                 })
             }else{
