@@ -56,14 +56,14 @@ app.post('/split-payments/compute', asyncHandler    ( async (req, res, next) => 
 
     if(flat.length > 0){
         for(let i = 0; i < flat.length; i++){
-            if( balance > flat[i].SplitValue){
+            if( balance >= flat[i].SplitValue  && flat[i].SplitValue > 0){
                 balance -= flat[i].SplitValue
                 SplitBreakdown.push({
                     SplitEntityId: flat[i].SplitEntityId,
                     Amount: flat[i].SplitValue
                 })
             }else{
-                return next(new ErrorResponse("You have insufficient balance"))
+                return next(new ErrorResponse("Wrong entry, try again"))
             }
         }
     }
@@ -71,30 +71,35 @@ app.post('/split-payments/compute', asyncHandler    ( async (req, res, next) => 
     
     if (percent.length > 0){
             for(let i = 0; i< percent.length; i++){
-                let amount = (percent[i].SplitValue/100 * balance)
-                balance -= amount;
-                SplitBreakdown.push({
-                    SplitEntityId: percent[i].SplitEntityId,
-                    Amount: amount
-                });
-            }
-            
+                if(percent[i].SplitValue > 0){
+                     let amount = (percent[i].SplitValue/100 * balance)
+                    balance -= amount;
+                    SplitBreakdown.push({
+                        SplitEntityId: percent[i].SplitEntityId,
+                        Amount: amount
+                    });
+                } 
+            }   
         }
         
         if (ratio.length > 0){
             let amount;
             let total = 0;
-            ratio.forEach(element => {
-                total += element.SplitValue;
-            });
+            for(let i = 0; i < ratio.length; i++){
+                if (ratio[i].SplitValue > 0){
+                    total += ratio[i].SplitValue;
+                }
+            }
             let leftAmount =  balance
            for(let i = 0; i < ratio.length; i++){  
-                amount = (ratio[i].SplitValue/total * leftAmount)
-                balance -= amount;
-                SplitBreakdown.push({
-                    SplitEntityId: ratio[i].SplitEntityId,
-                    Amount: amount
-                });
+                if(ratio[i].SplitValue > 0){
+                     amount = (ratio[i].SplitValue/total * leftAmount)
+                    balance -= amount;
+                    SplitBreakdown.push({
+                        SplitEntityId: ratio[i].SplitEntityId,
+                        Amount: amount
+                    });
+                }
            }
     }
 
