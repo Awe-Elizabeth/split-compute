@@ -89,7 +89,7 @@ app.post('/split-payments/compute', asyncHandler    ( async (req, res, next) => 
             let total = 0;
             for(let i = 0; i < ratio.length; i++){
                 if (ratio[i].SplitValue > 0){
-                    total += ratio[i].SplitValue;
+                    total += parseFloat(ratio[i].SplitValue);
                 }
             }
             let leftAmount =  balance
