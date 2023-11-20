@@ -78,7 +78,9 @@ app.post('/split-payments/compute', asyncHandler    ( async (req, res, next) => 
                         SplitEntityId: percent[i].SplitEntityId,
                         Amount: amount
                     });
-                } 
+                } else{
+                return next(new ErrorResponse("Wrong entry, try again"))
+                }
             }   
         }
         
@@ -99,6 +101,8 @@ app.post('/split-payments/compute', asyncHandler    ( async (req, res, next) => 
                         SplitEntityId: ratio[i].SplitEntityId,
                         Amount: amount
                     });
+                }else{
+                return next(new ErrorResponse("Wrong entry, try again"))
                 }
            }
     }
